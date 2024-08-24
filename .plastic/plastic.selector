@@ -1,0 +1,4 @@
+repository "GMTK 2024 - Built To Scale - Snake Game@OmegaFalcon@cloud"
+  path "/"
+    br "/main"
+    co "/main"

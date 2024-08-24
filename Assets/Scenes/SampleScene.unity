@@ -5392,7 +5392,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2253911629886400664, guid: c0b8b74e6cf15384ba5471aec33f4814, type: 3}
       propertyPath: m_Name
-      value: Grid Tile
+      value: Grid Tile BG
       objectReference: {fileID: 0}
     - target: {fileID: -2253911629886400664, guid: c0b8b74e6cf15384ba5471aec33f4814, type: 3}
       propertyPath: m_IsActive

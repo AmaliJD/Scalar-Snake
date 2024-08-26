@@ -14,7 +14,8 @@ public class Main : MonoBehaviour
         Game,
         Death,
         Paused,
-        End
+        End,
+        Restart
     }
 
     public GameState gameState;
@@ -115,7 +116,7 @@ public class Main : MonoBehaviour
         //    ui.SetThreshold((highestCaptureCount * captureThreshold).FloorToInt());
         //}
 
-        if (Input.GetKeyDown(KeyCode.Escape) && gameState != GameState.Paused && gameState != GameState.Death)
+        if (Input.GetKeyDown(KeyCode.Escape) && gameState != GameState.Paused && gameState != GameState.Death && gameState != GameState.Restart)
         {
             Time.timeScale = 0;
             previousState = gameState;
@@ -201,7 +202,10 @@ public class Main : MonoBehaviour
 
             case GameState.Paused:
                 if (Input.GetKeyDown(KeyCode.R))
-                    Restart();
+                {
+                    gameState = GameState.Restart;
+                    Invoke("Restart", .8f);
+                }
 
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
@@ -227,9 +231,18 @@ public class Main : MonoBehaviour
 
             case GameState.End:
                 if (Input.GetKeyDown(KeyCode.R))
-                    Restart();
+                {
+                    gameState = GameState.Restart;
+                    Invoke("Restart", .8f);
+                }
 
                 BGMusicSource.volume = Mathf.MoveTowards(BGMusicSource.volume, 0f, 1 * Time.unscaledDeltaTime);
+
+                break;
+
+            case GameState.Restart:
+                if(BGMusicSource.isPlaying)
+                    BGMusicSource.Stop();
 
                 break;
         }
@@ -257,7 +270,9 @@ public class Main : MonoBehaviour
     public int GetBiggestCapture() => biggestCapture;
     public UI GetUI() => ui;
     public PlayerMovement GetPlayer() => player;
-    public int GetOldHS() => oldHS_blocksCaptured;
+    public int GetOldBlocksHS() => oldHS_blocksCaptured;
+    public int GetOldCaptureHS() => oldHS_biggestCapture;
+    public int GetOldTimeHS() => oldHS_timeAlive;
     public bool Warning() => blocksCaptured < captureThresholdValue;
 
     public AudioSource GetBGMusic() => BGMusicSource;
@@ -267,6 +282,8 @@ public class Main : MonoBehaviour
     int HS_timeAlive;
 
     int oldHS_blocksCaptured;
+    int oldHS_biggestCapture;
+    int oldHS_timeAlive;
 
     private void SaveAudioPrefs()
     {
@@ -281,7 +298,7 @@ public class Main : MonoBehaviour
         //PlayerPrefs.SetInt("sfx volume", ui.GetSfxVolume());
         //PlayerPrefs.SetInt("muted", ui.GetMuted() ? 1 : 0);
 
-        if (HS_blocksCaptured > 7000)
+        if (HS_biggestCapture > 8500)
             return;
 
         PlayerPrefs.SetInt("HS_blocksCaptured", HS_blocksCaptured);
@@ -308,5 +325,7 @@ public class Main : MonoBehaviour
         }
 
         oldHS_blocksCaptured = HS_blocksCaptured;
+        oldHS_biggestCapture = HS_biggestCapture;
+        oldHS_timeAlive = HS_timeAlive;
     }
 }

@@ -8,6 +8,7 @@ using EX;
 using UnityEngine.Audio;
 using static UnityEngine.Rendering.DebugUI;
 using System.Threading;
+using DG.Tweening.Core;
 
 public class UI : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class UI : MonoBehaviour
     [SerializeField] TextMeshProUGUI suddenDeathTimer;
     [SerializeField] TextMeshProUGUI HS_BlocksCapturedText;
     [SerializeField] TextMeshProUGUI TimeText;
-    [SerializeField] TextMeshProUGUI LargestCaptureTextText;
+    [SerializeField] TextMeshProUGUI LargestCaptureText;
 
     // Slider
     [SerializeField] Slider blocksSlider;
@@ -56,6 +57,7 @@ public class UI : MonoBehaviour
     bool muted;
 
     [SerializeField] RectTransform HS_Capture, HS_Blocks, HS_Time, HS_Map;
+    [SerializeField] TextMeshProUGUI HS_Capture_SubTitle, HS_Blocks_SubTitle, HS_Time_SubTitle;
     [SerializeField] Vector2 hs_capture_scale_end;
     [SerializeField] Vector2 hs_capture_pos_end;
     [SerializeField] Vector2 hs_blocks_scale_end;
@@ -65,6 +67,8 @@ public class UI : MonoBehaviour
     [SerializeField] Vector2 hs_map_scale_end;
     [SerializeField] Vector2 hs_map_pos_end;
     [SerializeField] Image BGPanel;
+
+    [SerializeField] RectTransform RestartImage1, RestartImage2, RestartImage3, RestartImage4, RestartImageZ;
 
     [SerializeField] RectTransform AnyKeyText;
     public GameObject restartText;
@@ -100,6 +104,9 @@ public class UI : MonoBehaviour
     private void Start()
     {
         BestMapPixels();
+        HS_Blocks_SubTitle.text = "Best: " + main.GetOldBlocksHS();
+        HS_Capture_SubTitle.text = "Best: " + main.GetOldCaptureHS();
+        HS_Time_SubTitle.text = "Best: " + main.GetOldTimeHS();
     }
 
     public void SetBlocksCapturedText(int b, int t, int h)
@@ -116,12 +123,13 @@ public class UI : MonoBehaviour
         captureThreshold = t;
         highestCaptureCount = h;
 
-        if(HS_BlocksCapturedText.color != Color.yellow && highestCaptureCount > main.GetOldHS())
+        if(HS_BlocksCapturedText.color != Color.yellow && highestCaptureCount > main.GetOldBlocksHS())
         {
             HS_BlocksCapturedText.color = Color.yellow;
+            HS_Blocks_SubTitle.text = "New Best!";
         }
 
-        if(newHighest)
+        if (newHighest)
         {
             HS_BlocksCapturedText.fontSize = HS_BlocksCapturedText.fontSize * .8f;
             float fontSize = MathEX.Remap(1, 1000, 80, 220, Mathf.Clamp(highestCaptureCount, 1, 1000));
@@ -270,21 +278,51 @@ public class UI : MonoBehaviour
                     HS_Time.DOAnchorPos(hs_time_pos_end, .5f);
                     HS_Map.DOAnchorPos(hs_map_pos_end, .5f);
 
+                    HS_Blocks_SubTitle.GetComponent<RectTransform>().DOScale(Vector3.one, .5f).SetEase(Ease.OutBack).SetDelay(.5f);
+                    HS_Capture_SubTitle.GetComponent<RectTransform>().DOScale(Vector3.one, .5f).SetEase(Ease.OutBack).SetDelay(.5f);
+                    HS_Time_SubTitle.GetComponent<RectTransform>().DOScale(Vector3.one, .5f).SetEase(Ease.OutBack).SetDelay(.5f);
+
+                    HS_Capture.DOScale(hs_capture_scale_end, .5f);
+                    HS_Time.DOScale(hs_time_scale_end, .5f);
+
                     BGPanel.DOColor(Color.black.SetAlpha(0.654902f), .5f);
 
-                    LargestCaptureTextText.text = main.GetBiggestCapture().ToString();
+                    LargestCaptureText.text = main.GetBiggestCapture().ToString();
+
+                    if (LargestCaptureText.color != Color.yellow && main.GetBiggestCapture() > main.GetOldCaptureHS())
+                    {
+                        LargestCaptureText.color = Color.yellow;
+                        HS_Capture_SubTitle.text = "New Best!";
+                    }
+
+                    if (TimeText.color != Color.yellow && main.GetTime() > main.GetOldTimeHS())
+                    {
+                        TimeText.color = Color.yellow;
+                        HS_Time_SubTitle.text = "New Best!";
+                    }   
+
                     HS_Map.GetChild(0).GetComponent<RawImage>().color = Color.white;
 
-                    ended = false;
+                    DOTween.To(() => HS_BlocksCapturedText.fontSize, x => HS_BlocksCapturedText.fontSize = x, 80, .5f);
+
+                    ended = true;
 
                     restartText.SetActive(true);
                 }
 
-                //HS_Blocks.localScale = Vector2.MoveTowards(HS_Blocks.localScale, hs_blocks_scale_end, 20 * Time.deltaTime);
-                //HS_Capture.localScale = Vector2.MoveTowards(HS_Capture.localScale, hs_capture_scale_end, 20 * Time.deltaTime);
-                //HS_Time.localScale = Vector2.MoveTowards(HS_Time.localScale, hs_time_scale_end, 20 * Time.deltaTime);
-                //HS_Map.localScale = Vector2.MoveTowards(HS_Map.localScale, hs_map_scale_end, 20 * Time.deltaTime);
+                break;
 
+            case Main.GameState.Restart:
+                if(!restarting)
+                {
+                    Time.timeScale = 1;
+                    RestartImage1.DOAnchorPos(Vector2.zero, .5f).SetEase(Ease.InCubic);
+                    RestartImage2.DOAnchorPos(Vector2.zero, .5f).SetEase(Ease.InCubic).SetDelay(.1f);
+                    RestartImage3.DOAnchorPos(Vector2.zero, .5f).SetEase(Ease.InCubic).SetDelay(.15f);
+                    RestartImage4.DOAnchorPos(Vector2.zero, .5f).SetEase(Ease.InCubic).SetDelay(.2f);
+                    RestartImageZ.DOAnchorPos(Vector2.zero, .5f).SetEase(Ease.InCubic).SetDelay(.25f);
+                    restarting = true;
+                }
                 break;
         }
 
@@ -296,6 +334,7 @@ public class UI : MonoBehaviour
     }
 
     bool ended;
+    bool restarting;
 
     void EnablePauseMenu()
     {
@@ -384,6 +423,9 @@ public class UI : MonoBehaviour
 
     public void SetMapPixels(bool fullTex = false)
     {
+        if (main.gameState == Main.GameState.Death || main.gameState == Main.GameState.End)
+            return;
+
         Vector2Int min = Grid.WorldToGrid(new Vector2(Fill.fill.minX, Fill.fill.minY)).RoundToInt();
         Vector2Int max = Grid.WorldToGrid(new Vector2(Fill.fill.maxX, Fill.fill.maxY)).RoundToInt();
 

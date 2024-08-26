@@ -176,31 +176,31 @@ public class TileManager : MonoBehaviour
                 }
                 else // Find next dying cells
                 {
-                    // SPAWN SECOND VIRUS - disabled cuz that's unnessesary, game's already hard enough
-                    //if (Time.time > timeOfLastSpawn + waitSpawnTime && main.GetBlocksCaptured() > 700)
-                    //{
-                    //    timeOfLastSpawn = Time.time;
-                    //    int i, j;
-                    //    do
-                    //    {
-                    //        i = UnityEngine.Random.Range(0, Grid.gridSize);
-                    //        j = UnityEngine.Random.Range(0, Grid.gridSize);
-                    //    }
-                    //    while (!Grid.CheckCell(new Vector2(i, j), 1, true));
+                    // SPAWN SECOND VIRUS - disabled cuz that's unnessesary, game's already hard enough - nvm reenabled at 5K
+                    if (Time.time > timeOfLastSpawn + waitSpawnTime && main.GetBlocksCaptured() > 5000)
+                    {
+                        timeOfLastSpawn = Time.time;
+                        int i, j;
+                        do
+                        {
+                            i = UnityEngine.Random.Range(0, Grid.gridSize);
+                            j = UnityEngine.Random.Range(0, Grid.gridSize);
+                        }
+                        while (!Grid.CheckCell(new Vector2(i, j), 1, true));
 
-                    //    //EnableTile(i, j, 2);
-                    //    DropDying(new Vector2Int(i, j));
-                    //    Grid.SetGrid(new Vector2(i, j), 3, true);
+                        //EnableTile(i, j, 2);
+                        DropDying(new Vector2Int(i, j));
+                        Grid.SetGrid(new Vector2(i, j), 3, true);
 
-                    //    /*if (Time.time > timeOfLastVirusAudio + TIME_BETWEEN_VIRUS_AUDIO)
-                    //    {
-                    //        SfxManager.instance.PlaySfxClip(virusSpreadSfx, 1f, 1, Grid.GridToWorld(new Vector2(i, j)));
-                    //        timeOfLastVirusAudio = Time.time;
-                    //    }*/
+                        /*if (Time.time > timeOfLastVirusAudio + TIME_BETWEEN_VIRUS_AUDIO)
+                        {
+                            SfxManager.instance.PlaySfxClip(virusSpreadSfx, 1f, 1, Grid.GridToWorld(new Vector2(i, j)));
+                            timeOfLastVirusAudio = Time.time;
+                        }*/
 
-                    //    dyingList.Add(new Vector2Int(i, j));
-                    //    main.GetUI().SetMapPixels();
-                    //}
+                        dyingList.Add(new Vector2Int(i, j));
+                        main.GetUI().SetMapPixels();
+                    }
 
                     List<Vector2Int> deadList = new(dyingList);
                     dyingList.Clear();

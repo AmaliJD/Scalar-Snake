@@ -59,15 +59,17 @@ public class Powerup : MonoBehaviour
         if(!got)
         {
             got = true;
-            SfxManager.instance.PlaySfxClip(despawnSfx, 1f, 1, transform.position);
+            Main main = GameObject.FindGameObjectWithTag("Main").GetComponent<Main>();
 
-            GameObject mainObj = GameObject.FindGameObjectWithTag("Main");
-            //Transform player = mainObj.GetComponent<PlayerMovement>().GetPlayer();
             GetComponent<SpriteRenderer>().color = Color.black;
-            //Vector2 gridPos = Grid.WorldToGrid(player.position);
 
-            Destroy(mainObj.GetComponent<PowerupManager>().GetPowerupMapHolder().Find($"[{transform.position.x},{transform.position.y}]").gameObject);
-            transform.DOScale(Vector3.zero, .3f).SetEase(Ease.InBack).OnComplete(() => Destroy(gameObject));
+            if (main.gameState == Main.GameState.Game)
+            {
+                SfxManager.instance.PlaySfxClip(despawnSfx, 1f, 1, transform.position);
+                Destroy(main.gameObject.GetComponent<PowerupManager>().GetPowerupMapHolder().Find($"[{transform.position.x},{transform.position.y}]").gameObject);
+                transform.DOScale(Vector3.zero, .3f).SetEase(Ease.InBack).OnComplete(() => Destroy(gameObject));
+            }
+                
         }
     }
 }

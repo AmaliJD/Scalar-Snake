@@ -46,25 +46,24 @@ public class CameraManager : MonoBehaviour
                 //y = Mathf.MoveTowards(y, player.GetPlayer().position.y, (1 / player.StepTime()) * .1f * Time.deltaTime);
                 //cam.transform.position = cam.transform.position.SetXY(x, y);
 
-                cam.transform.position = Vector3.MoveTowards(cam.transform.position, player.GetPlayer().position + (Vector3)player.GetCurrentDirection().MultiplyEach(1, 4), (1 / player.StepTime()) * 1.4f * Time.deltaTime).SetZ(-10);
-                
-                // MOVE TO FOCUS POSITION
-                //Vector3 direction = (Vector3)((player.GetCurrentDirection() + previousDirectionBlend));
-                //Vector3 focusPosition = direction.MultiplyEach(2, 4)
-                //                        * -MathEX.Remap(0.0025f, .09f, -1.25f, -1, Mathf.Pow(player.GetWaitTime(), 2)) // speed
-                //                        * MathEX.RemapClamped(0, Grid.gridSize / 2, 1, 3, Vector2.Distance(player.GetPlayer().position, Vector2.zero)); // distance from center
-                //Debug.Log($"Blend: {previousDirectionBlend}, Direction: {direction}");
+                //cam.transform.position = Vector3.MoveTowards(cam.transform.position, player.GetPlayer().position + (Vector3)player.GetCurrentDirection().MultiplyEach(1, 4), (1 / player.StepTime()) * 1.4f * Time.deltaTime).SetZ(-10);
 
-                //cam.transform.position = Vector3.MoveTowards(cam.transform.position,
-                //                                             player.GetPlayer().position + focusPosition, /*(1 / player.StepTime()) * 1.2f*/6f * Time.deltaTime).SetZ(-10);
-                //previousDirectionBlend = MathEX.ExpDecay(previousDirectionBlend, Vector2.zero, .000001f, Time.deltaTime);
+                // MOVE TO FOCUS POSITION
+                Vector3 direction = (Vector3)((player.GetCurrentDirection() + previousDirectionBlend));
+                Vector3 focusPosition = direction.MultiplyEach(2, 4)
+                                                                     * -MathEX.Remap(0.0025f, .09f, -2f, -1, Mathf.Pow(player.GetWaitTime(), 2)) // speed
+                                                                     * MathEX.RemapClamped(0, Mathf.Sqrt(Grid.gridSize / 2), 1, 1.5f, Mathf.Sqrt(Vector2.Distance(player.GetPlayer().position, Vector2.zero))); // distance from center
+                                                                     //Debug.Log($"Blend: {previousDirectionBlend}, Direction: {direction}");
+
+                cam.transform.position = Vector3.MoveTowards(cam.transform.position, player.GetPlayer().position + focusPosition, (1 / player.StepTime()) * 1.2f * Time.deltaTime).SetZ(-10);
+                previousDirectionBlend = MathEX.ExpDecay(previousDirectionBlend, Vector2.zero, .000001f, Time.deltaTime);
                 previousDirectionBlend = Vector2.MoveTowards(previousDirectionBlend, Vector2.zero, .5f * Time.deltaTime);
 
                 // CLAMP CAMERA
                 float camHalfHeight = cam.orthographicSize;
                 float camHalfWidth = cam.orthographicSize * 16f / 9f;
                 float halfGridWidth = Grid.gridSize / 2;
-                Vector2 cornerPos = new Vector2(halfGridWidth - camHalfWidth + 3, halfGridWidth - camHalfHeight + 3);
+                Vector2 cornerPos = new Vector2(halfGridWidth - camHalfWidth + 4, halfGridWidth - camHalfHeight + 4);
                 cam.transform.position = MathEX.Vector2AreaClamp(cam.transform.position, -cornerPos, cornerPos);
 
                 // RECALC PREVIOUS POSITION
